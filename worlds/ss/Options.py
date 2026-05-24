@@ -368,7 +368,7 @@ class RandomizeEntrances(Choice):
     option_none = 0
     option_required_dungeons_only = 1
     option_dungeons_only = 2
-    option_all_entrances = 3
+    #option_all_entrances = 3
     default = 0
 
 
@@ -795,8 +795,8 @@ class HintDistribution(Choice):
     option_location_and_item_hints_only = 4
     option_large_multiworld = 5
     option_standard_with_dungeon_er = 6
-    option_full_entrance_rando = 7
-    option_junk = 8
+    #option_full_entrance_rando = 7
+    option_junk = 7
     default = 0
 
 class SongHints(Choice):

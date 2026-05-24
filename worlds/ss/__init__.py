@@ -43,9 +43,9 @@ from .rando.MiscRando import shuffle_batreaux_counts
 
 from .logic.Requirements import location_requirements, exit_requirements, ALL_REQUIREMENTS
 
-AP_VERSION = [0, 6, 5]
-WORLD_VERSION = [0, 7, 0]
-RANDO_VERSION = [0, 7, 0]
+AP_VERSION = [0, 6, 7]
+WORLD_VERSION = [0, 5, 6]
+RANDO_VERSION = [0, 5, 6]
 
 
 def run_client() -> None:
@@ -129,7 +129,7 @@ class SSWorld(World):
     game: ClassVar[str] = "Skyward Sword"
     topology_present: bool = True
     web = SSWeb()
-    required_client_version: tuple[int, int, int] = (0, 5, 1)
+    required_client_version: tuple[int, int, int] = (0, 5, 6)
     origin_region_name: str = "" # This is set later
     explicit_indirect_conditions = True 
     

@@ -43,7 +43,7 @@ class Hints:
             "Location and Item Hints Only",
             "Large Multiworld",
             "Standard with Dungeon ER",
-            "Full Entrance Rando",
+            #"Full Entrance Rando",
             "Junk",
         ][self.world.options.hint_distribution.value]
         self.distribution: dict[str, any] = HINT_DISTRIBUTIONS[self.distribution_option]
