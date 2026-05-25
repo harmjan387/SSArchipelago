@@ -126,7 +126,7 @@ STORYFLAG_START_ADDR = 0x805A9AD8
 SCENEFLAG_START_ADDR = 0x80956EC8
 
 # Boolean used by the patched game to determine whether to use networking & display network info
-NETWORK_USAGE_BOOL = 0x80686871 # Be sure to update if the patcher ever changes something in the assembly!
+NETWORK_USAGE_BOOL = 0x806871F5 # Be sure to update if the patcher ever changes something in the assembly!
 
 # DME Connection Messages for the client
 CONNECTION_REFUSED_GAME_STATUS = "Dolphin failed to connect. Please load a randomized ROM for Skyward Sword. Trying again in 5 seconds..."
