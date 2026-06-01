@@ -4,8 +4,7 @@ from BaseClasses import ItemClassification as IC
 from BaseClasses import LocationProgressType
 from Fill import FillError
 from Options import OptionError
-from rule_builder import options
-from worlds.apquest import world
+
 
 from ..Items import ITEM_TABLE, CONSUMABLE_ITEMS
 from ..Locations import LOCATION_TABLE, SSLocType, SSLocFlag
@@ -338,7 +337,7 @@ def _handle_placements(world: "SSWorld", pool: list[str]) -> list[str]:
         placed.extend(GONDO_UPGRADES)
         # We're not actually going to place these in the world, the rando will patch them in
         # Still, remove them from the item pool
-        
+
     ### DUNGEON PLACEMENTS
 
     # Place vanilla keys first to prevent location overlap
