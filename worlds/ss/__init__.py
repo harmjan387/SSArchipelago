@@ -131,7 +131,7 @@ class SSWorld(World):
     web = SSWeb()
     required_client_version: tuple[int, int, int] = (0, 5, 6)
     origin_region_name: str = "" # This is set later
-    explicit_indirect_conditions = True 
+    explicit_indirect_conditions = False 
     
     item_name_to_id: ClassVar[dict[str, int]] = {
         name: SSItem.get_apid(data.code)
@@ -347,10 +347,10 @@ class SSWorld(World):
                     # Create a batreaux reward location
                     location = SSLocation(self.player, full_loc_name, region, LOCATION_TABLE[og_full_loc_name], ogname=og_full_loc_name)
                 else:
+                    if full_loc_name in self.nonprogress_locations:
+                        continue
                     # Create a normal location
                     location = SSLocation(self.player, full_loc_name, region, LOCATION_TABLE[full_loc_name])
-                if full_loc_name in self.nonprogress_locations:
-                    location.progress_type = LocationProgressType.EXCLUDED
                 region.locations.append(location)
             self.multiworld.regions.append(region)
 
@@ -375,6 +375,8 @@ class SSWorld(World):
 
         for loc in LOCATION_TABLE.keys():
             if LOCATION_TABLE[loc].region == "Batreaux's House":
+                continue
+            if loc in self.nonprogress_locations:
                 continue
             assert self.get_location(loc), f"Location found in location table, but not in requirements: {loc}"
 
@@ -588,11 +590,11 @@ class SSWorld(World):
             ).value
 
         # Excluded locations, and account for batreaux checks
-        for loc in self.nonprogress_locations:
-            if self.get_location(loc).ogname:
-                output_data["Excluded Locations"].add(self.get_location(loc).ogname)
-            else:
-                output_data["Excluded Locations"].add(loc)
+       # for loc in self.nonprogress_locations:
+        #    if self.get_location(loc).ogname:
+         #       output_data["Excluded Locations"].add(self.get_location(loc).ogname)
+          #  else:
+           #     output_data["Excluded Locations"].add(loc)
 
         # Unused options in AP must be filled for the patcher
         output_data["Options"]["limit-start-entrance"] = 0

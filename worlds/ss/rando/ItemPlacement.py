@@ -1,9 +1,11 @@
 from typing import TYPE_CHECKING
-
+import logging
 from BaseClasses import ItemClassification as IC
 from BaseClasses import LocationProgressType
 from Fill import FillError
 from Options import OptionError
+from rule_builder import options
+from worlds.apquest import world
 
 from ..Items import ITEM_TABLE, CONSUMABLE_ITEMS
 from ..Locations import LOCATION_TABLE, SSLocType, SSLocFlag
@@ -286,11 +288,9 @@ def _handle_placements(world: "SSWorld", pool: list[str]) -> list[str]:
             placed.append("Gratitude Crystal")
 
     if not options.treasuresanity_in_silent_realms:
-        for loc, data in LOCATION_TABLE.items():
-            if data.type == SSLocType.RELIC:
-                world.get_location(loc).place_locked_item(
-                    world.create_item("Dusk Relic")
-                )
+        for loc in world.get_locations():
+            if getattr(loc, "type", None) == SSLocType.RELIC:
+                loc.place_locked_item(world.create_item("Dusk Relic"))
                 placed.append("Dusk Relic")
     else:
         num_relics = options.trial_treasure_amount.value
@@ -338,7 +338,7 @@ def _handle_placements(world: "SSWorld", pool: list[str]) -> list[str]:
         placed.extend(GONDO_UPGRADES)
         # We're not actually going to place these in the world, the rando will patch them in
         # Still, remove them from the item pool
-
+        
     ### DUNGEON PLACEMENTS
 
     # Place vanilla keys first to prevent location overlap
