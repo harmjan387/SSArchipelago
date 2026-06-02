@@ -159,7 +159,7 @@ class DungeonKeyHandler:
         elif self.world.options.map_mode == "anywhere":
             return []
         for dun, map_item in self.all_maps.items():
-            if(not self.world.options.empty_unrequired_dungeons and dun not in self.world.dungeons.progression_dungeons): 
+            if (not self.world.options.empty_unrequired_dungeons and dun not in self.progression_dungeons): 
                 continue
             if map_item in self.start_maps:
                 continue
@@ -201,7 +201,6 @@ class DungeonKeyHandler:
             for dun in list(locs_placeable.keys()):
                 if dun not in self.progression_dungeons and self.world.options.empty_unrequired_dungeons:
                     del locs_placeable[dun]
-            print(locs_placeable)
             for dun, keydata in locs_placeable.items():
                 if dun in self.progression_dungeons:
                     for i, locs in keydata.items():
@@ -270,16 +269,20 @@ class DungeonKeyHandler:
             ]:
                 # In this case, we must place the key in sand sea
                 locs_placeable.extend([
-                    loc for loc, data in LOCATION_TABLE.items()
-                    if data.region in ["Lanayru Sand Sea"]
-                    and self.world.get_location(loc).item is None
+                    loc.name
+                    for loc in self.multiworld.get_locations(self.world.player)
+                    if loc.name in LOCATION_TABLE
+                    and LOCATION_TABLE[loc.name].region in ["Lanayru Sand Sea"]
+                    and loc.item is None
                 ])
             else:
                 # Otherwise, place the key anywhere except sand sea
                 locs_placeable.extend([
-                    loc for loc, data in LOCATION_TABLE.items()
-                    if data.region in ["Lanayru Mine", "Lanayru Desert", "Lanayru Caves", "Lanayru Gorge"]
-                    and self.world.get_location(loc).item is None
+                    loc.name
+                    for loc in self.multiworld.get_locations(self.world.player)
+                    if loc.name in LOCATION_TABLE
+                    and LOCATION_TABLE[loc.name].region in ["Lanayru Mine", "Lanayru Desert", "Lanayru Caves", "Lanayru Gorge"]
+                    and loc.item is None
                 ])
         elif self.world.options.lanayru_caves_small_key == "anywhere":
             return []
@@ -331,7 +334,7 @@ class DungeonKeyHandler:
         elif self.world.options.boss_key_mode == "anywhere":
             return []
         for dun, bkey_item in self.all_bkeys.items():
-            if(not self.world.options.empty_unrequired_dungeons and dun not in self.world.dungeons.progression_dungeons):
+            if(not self.world.options.empty_unrequired_dungeons and dun not in self.progression_dungeons):
                 continue
             if bkey_item in self.start_bkeys:
                 continue

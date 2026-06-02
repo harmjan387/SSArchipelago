@@ -5,7 +5,6 @@ from BaseClasses import LocationProgressType
 from Fill import FillError
 from Options import OptionError
 
-
 from ..Items import ITEM_TABLE, CONSUMABLE_ITEMS
 from ..Locations import LOCATION_TABLE, SSLocType, SSLocFlag
 from ..Constants import *
@@ -325,13 +324,7 @@ def _handle_placements(world: "SSWorld", pool: list[str]) -> list[str]:
                 # If we can't place any more tadtones, put a junk item here
                 tad.progress_type = LocationProgressType.EXCLUDED
 
-    if not options.rupeesanity:
-        for loc, data in LOCATION_TABLE.items():
-            if data.flags & SSLocFlag.RUPEE:
-                world.get_location(loc).place_locked_item(
-                    world.create_item(data.vanilla_item)
-                )
-                placed.append(data.vanilla_item)
+
 
     if not options.gondo_upgrades:
         placed.extend(GONDO_UPGRADES)
@@ -374,7 +367,7 @@ def _handle_placements(world: "SSWorld", pool: list[str]) -> list[str]:
             placed.append("Progressive Sword")
 
     # Vanilla Triforces
-    if options.triforce_shuffle == "vanilla":
+    if options.triforce_shuffle == "vanilla" and (options.triforce_required or not options.empty_unrequired_dungeons):
         world.get_location("Sky Keep - Sacred Power of Din").place_locked_item(world.create_item("Triforce of Power"))
         world.get_location("Sky Keep - Sacred Power of Nayru").place_locked_item(world.create_item("Triforce of Wisdom"))
         world.get_location("Sky Keep - Sacred Power of Farore").place_locked_item(world.create_item("Triforce of Courage"))
@@ -391,7 +384,7 @@ def _handle_placements(world: "SSWorld", pool: list[str]) -> list[str]:
         placed.extend(world.dungeons.key_handler.place_dungeon_maps())
 
     # Non-vanilla Triforces
-    if options.triforce_shuffle == "sky_keep":
+    if options.triforce_shuffle == "sky_keep" and (options.triforce_required or not options.empty_unrequired_dungeons):
         locations_to_place = [loc for loc in world.multiworld.get_locations(world.player) if world.region_to_hint_region(loc.parent_region) == "Sky Keep" and not loc.item]
         triforce_locations = world.random.sample(locations_to_place, 3)
         world.random.shuffle(triforce_locations)
