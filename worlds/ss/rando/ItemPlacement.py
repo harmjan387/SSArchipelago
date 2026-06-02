@@ -324,8 +324,6 @@ def _handle_placements(world: "SSWorld", pool: list[str]) -> list[str]:
                 # If we can't place any more tadtones, put a junk item here
                 tad.progress_type = LocationProgressType.EXCLUDED
 
-
-
     if not options.gondo_upgrades:
         placed.extend(GONDO_UPGRADES)
         # We're not actually going to place these in the world, the rando will patch them in

@@ -297,6 +297,7 @@ class SSWorld(World):
 
         self.batreaux_rewards = shuffle_batreaux_counts(self)
         self.batreaux_requirements = {}
+        self.batreaux_ognames = {}
 
     def create_regions(self) -> None:
         """
@@ -327,16 +328,19 @@ class SSWorld(World):
                         short_loc_name = f"{str(crystal_count)} Crystals Chest"
                         full_loc_name = f"{data["hint_region"]} - {str(crystal_count)} Crystals Chest"
                         self.batreaux_requirements[short_loc_name] = f"{str(crystal_count)} Gratitude Crystals"
+                        self.batreaux_ognames[full_loc_name] = og_full_loc_name
                     elif short_loc_name == "Seventh Reward":
                         crystal_count = self.batreaux_rewards["Sixth Reward"]
                         short_loc_name = f"{str(crystal_count)} Crystals Second Reward"
                         full_loc_name = f"{data["hint_region"]} - {str(crystal_count)} Crystals Second Reward"
                         self.batreaux_requirements[short_loc_name] = f"{str(crystal_count)} Gratitude Crystals"
+                        self.batreaux_ognames[full_loc_name] = og_full_loc_name
                     else:
                         crystal_count = self.batreaux_rewards[short_loc_name]
                         short_loc_name = f"{str(crystal_count)} Crystals"
                         full_loc_name = f"{data["hint_region"]} - {str(crystal_count)} Crystals"
                         self.batreaux_requirements[short_loc_name] = f"{str(crystal_count)} Gratitude Crystals"
+                        self.batreaux_ognames[full_loc_name] = og_full_loc_name
 
                     # Add new location back into progress or nonprogress locations
                     if bat_loc_progress:
@@ -580,7 +584,7 @@ class SSWorld(World):
             "Starting Statues": self.entrances.starting_statues,
             "Starting Entrance": self.entrances.starting_entrance,
         }
-
+        print("Entrances:", output_data["Entrances"])
         # Output options to file.
         for field in fields(self.options):
             if field.name =="plando_items":
@@ -590,11 +594,16 @@ class SSWorld(World):
             ).value
 
         # Excluded locations, and account for batreaux checks
-       # for loc in self.nonprogress_locations:
-        #    if self.get_location(loc).ogname:
-         #       output_data["Excluded Locations"].add(self.get_location(loc).ogname)
-          #  else:
-           #     output_data["Excluded Locations"].add(loc)
+        for loc in self.nonprogress_locations:
+            if loc in self.batreaux_ognames:
+                output_data["Excluded Locations"].add(self.batreaux_ognames[loc])
+            else:
+                output_data["Excluded Locations"].add(loc)
+        #for loc in self.nonprogress_locations:
+            #if self.get_location(loc).ogname:
+                #output_data["Excluded Locations"].add(self.get_location(loc).ogname)
+            #else:
+               #output_data["Excluded Locations"].add(loc)
 
         # Unused options in AP must be filled for the patcher
         output_data["Options"]["limit-start-entrance"] = 0
