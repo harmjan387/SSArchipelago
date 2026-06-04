@@ -389,7 +389,7 @@ def _handle_placements(world: "SSWorld", pool: list[str]) -> list[str]:
         for i, tri in enumerate(["Triforce of Power", "Triforce of Wisdom", "Triforce of Courage"]):
             triforce_locations[i].place_locked_item(world.create_item(tri))
         placed.extend(["Triforce of Power", "Triforce of Wisdom", "Triforce of Courage"])
-
+        
     return placed
 
 

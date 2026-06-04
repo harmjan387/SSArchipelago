@@ -584,7 +584,6 @@ class SSWorld(World):
             "Starting Statues": self.entrances.starting_statues,
             "Starting Entrance": self.entrances.starting_entrance,
         }
-        print("Entrances:", output_data["Entrances"])
         # Output options to file.
         for field in fields(self.options):
             if field.name =="plando_items":
@@ -599,11 +598,6 @@ class SSWorld(World):
                 output_data["Excluded Locations"].add(self.batreaux_ognames[loc])
             else:
                 output_data["Excluded Locations"].add(loc)
-        #for loc in self.nonprogress_locations:
-            #if self.get_location(loc).ogname:
-                #output_data["Excluded Locations"].add(self.get_location(loc).ogname)
-            #else:
-               #output_data["Excluded Locations"].add(loc)
 
         # Unused options in AP must be filled for the patcher
         output_data["Options"]["limit-start-entrance"] = 0

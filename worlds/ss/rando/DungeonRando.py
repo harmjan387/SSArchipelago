@@ -136,6 +136,9 @@ class DungeonKeyHandler:
                         continue
                     loc.place_locked_item(self.world.create_item(data.vanilla_item))
                     placed.append(data.vanilla_item)
+                for dun, map_item in self.all_maps.items():
+                    if(self.world.options.empty_unrequired_dungeons == True and dun not in self.progression_dungeons and map_item not in placed):
+                        placed.extend([map_item])
             return placed
         elif self.world.options.map_mode == "own_dungeon_restricted":
             for dun in self.all_maps.keys():
@@ -159,8 +162,9 @@ class DungeonKeyHandler:
         elif self.world.options.map_mode == "anywhere":
             return []
         for dun, map_item in self.all_maps.items():
-            if (not self.world.options.empty_unrequired_dungeons and dun not in self.progression_dungeons): 
-                continue
+            if (self.world.options.empty_unrequired_dungeons == True and dun not in self.progression_dungeons):
+                    placed.extend([map_item]) 
+                    continue
             if map_item in self.start_maps:
                 continue
             if len(locs_placeable[dun])== 0:
@@ -183,7 +187,9 @@ class DungeonKeyHandler:
         if self.world.options.small_key_mode == "vanilla":
             for dun, skey_items in self.all_skeys.items():
                 if dun not in self.progression_dungeons and self.world.options.empty_unrequired_dungeons:
-                    continue
+                        for skey in skey_items:
+                            placed.extend([skey])
+                        continue
                 dun_start_skeys = self.start_skeys.count(skey_items[0])
                 for i, skey in enumerate(skey_items):
                     if i < dun_start_skeys:
@@ -213,14 +219,17 @@ class DungeonKeyHandler:
         for dun, skey_items in self.all_skeys.items():
             dun_start_skeys = self.start_skeys.count(skey_items[0])
             if dun not in locs_placeable:
+                    if self.world.options.empty_unrequired_dungeons == True and dun not in self.progression_dungeons:
+                        for skey in skey_items:
+                            placed.append(skey)
                     continue
             for i, skey in enumerate(skey_items):
-                if (not self.world.options.empty_unrequired_dungeons and dun not in self.progression_dungeons):
+                if (self.world.options.empty_unrequired_dungeons == True and dun not in self.progression_dungeons):
                      continue
                 if i < dun_start_skeys:
                     continue
                 if len(locs_placeable[dun][i]) == 0:
-                    if (not self.world.options.empty_unrequired_dungeons and dun not in self.world.dungeons.progression_dungeons):
+                    if (self.world.options.empty_unrequired_dungeons == False and dun not in self.progression_dungeons):
                         raise FillError(f"Could not find a location to place small key: {skey}")
                     else: 
                         continue
@@ -315,6 +324,9 @@ class DungeonKeyHandler:
                         continue
                     (loc).place_locked_item(self.world.create_item(data.vanilla_item))
                     placed.append(data.vanilla_item)
+                for dun, bkey_item in self.all_bkeys.items():
+                    if(self.world.options.empty_unrequired_dungeons == True and dun not in self.progression_dungeons and bkey_item not in placed):
+                        placed.extend([bkey_item])
             return placed
         elif self.world.options.boss_key_mode == "own_dungeon":
             for dun in self.all_bkeys.keys():
@@ -334,7 +346,8 @@ class DungeonKeyHandler:
         elif self.world.options.boss_key_mode == "anywhere":
             return []
         for dun, bkey_item in self.all_bkeys.items():
-            if(not self.world.options.empty_unrequired_dungeons and dun not in self.progression_dungeons):
+            if(self.world.options.empty_unrequired_dungeons == True and dun not in self.progression_dungeons):
+                placed.append(bkey_item)
                 continue
             if bkey_item in self.start_bkeys:
                 continue
