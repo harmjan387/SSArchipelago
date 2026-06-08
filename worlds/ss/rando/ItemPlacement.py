@@ -90,6 +90,7 @@ def _create_base_itempool(world: "SSWorld") -> tuple[list[str], list[str], list[
     progression_pool: list[str] = []
     useful_pool: list[str] = []
     filler_pool: list[str] = []
+
     for item, data in ITEM_TABLE.items():
         if data.type in ["Item", "Small Key", "Boss Key", "Map"]:
             adjusted_classification = item_classification(world, item)
@@ -389,7 +390,7 @@ def _handle_placements(world: "SSWorld", pool: list[str]) -> list[str]:
         for i, tri in enumerate(["Triforce of Power", "Triforce of Wisdom", "Triforce of Courage"]):
             triforce_locations[i].place_locked_item(world.create_item(tri))
         placed.extend(["Triforce of Power", "Triforce of Wisdom", "Triforce of Courage"])
-        
+
     return placed
 
 
@@ -419,37 +420,6 @@ def item_classification(world: "SSWorld", name: str) -> IC | None:
             if name == "Stone of Trials":
                 adjusted_classification = IC.filler
     
-    # Dungeon Items
-    if (
-        world.options.empty_unrequired_dungeons
-        and item_type in ["Map", "Small Key", "Boss Key"]
-    ):
-        if item_type == "Map":
-            item_dungeon = name[:-4]
-            if item_dungeon == "Sky Keep":
-                adjusted_classification = IC.filler if not world.dungeons.sky_keep_required else None
-            elif not item_dungeon in world.dungeons.required_dungeons:
-                adjusted_classification = IC.filler
-                # If map not a required dungeon, make it filler
-                # Otherwise, it will be useful
-        if item_type == "Small Key":
-            item_dungeon = name[:-10]
-            if item_dungeon == "Sky Keep":
-                adjusted_classification = IC.filler if not world.dungeons.sky_keep_required else None
-            elif item_dungeon == "Lanayru Caves":
-                pass
-                # Caves key will always stay progression
-            elif not item_dungeon in world.dungeons.required_dungeons:
-                adjusted_classification = IC.filler
-                # If small key not a required dungeon, make it filler
-                # Otherwise, it will be progression
-        if item_type == "Boss Key":
-            item_dungeon = name[:-9]
-            if not item_dungeon in world.dungeons.required_dungeons:
-                adjusted_classification = IC.filler
-                # If boss key not a required dungeon, make it filler
-                # Otherwise, it will be progression
-
     # Triforces
     if not world.options.triforce_required:
         if "Triforce" in name:
