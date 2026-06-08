@@ -1,5 +1,5 @@
 from typing import TYPE_CHECKING
-import logging
+
 from BaseClasses import ItemClassification as IC
 from BaseClasses import LocationProgressType
 from Fill import FillError
@@ -90,7 +90,6 @@ def _create_base_itempool(world: "SSWorld") -> tuple[list[str], list[str], list[
     progression_pool: list[str] = []
     useful_pool: list[str] = []
     filler_pool: list[str] = []
-
     for item, data in ITEM_TABLE.items():
         if data.type in ["Item", "Small Key", "Boss Key", "Map"]:
             adjusted_classification = item_classification(world, item)

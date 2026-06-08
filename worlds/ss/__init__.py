@@ -28,7 +28,7 @@ from worlds.LauncherComponents import (
 from .Constants import *
 
 from .Items import ITEM_TABLE, SSItem
-from .Locations import LOCATION_TABLE, SSLocation, SSLocFlag
+from .Locations import LOCATION_TABLE, SSLocType, SSLocation, SSLocFlag
 from .Options import SSOptions
 from .Rules import set_rules
 from .Names import HASH_NAMES
@@ -632,6 +632,31 @@ class SSWorld(World):
                     output_data["Locations"][location.ogname] = item_info
                 else:
                     output_data["Locations"][location.name] = item_info
+
+        for location in self.nonprogress_locations:
+            loc_data = LOCATION_TABLE.get(location)
+
+            if loc_data is None:
+                item_name = "Red Rupee"
+            else:    
+                #decide if want to place vanilla item or fallback to red rupee
+                is_trial_relic = loc_data.type == SSLocType.RELIC
+                is_rupee_location = loc_data.flags == SSLocFlag.RUPEE
+
+                if is_trial_relic or is_rupee_location:
+                    item_name = loc_data.vanilla_item
+                else:
+                    item_name = "Red Rupee"
+                item_info = {
+                    "player": self.player,
+                    "name": item_name,
+                    "game": "Skyward Sword",
+                    "classification": "filler",
+                }
+                if location in self.batreaux_ognames:
+                    output_data["Locations"][self.batreaux_ognames[location]] = item_info
+                else:
+                    output_data["Locations"][location] = item_info
 
         # Output the plando details to file.
         apssr = SSContainer(
