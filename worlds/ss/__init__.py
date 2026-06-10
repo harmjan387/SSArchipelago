@@ -166,6 +166,7 @@ class SSWorld(World):
 
         progress_locations: set[str] = set()
         nonprogress_locations: set[str] = set()
+        trial_relic_amount = self.options.trial_treasure_amount.value
 
         def add_flag(option: Toggle, flag: SSLocFlag) -> SSLocFlag:
             return flag if option else SSLocFlag.ALWAYS
@@ -242,6 +243,12 @@ class SSWorld(World):
                     progress_locations.add(loc)
                 else:
                     nonprogress_locations.add(loc)
+            elif (self.options.treasuresanity_in_silent_realms 
+                  and data.flags & SSLocFlag.TRIAL and data.type == SSLocType.RELIC 
+                  and int(loc.split(" ")[-1]) > trial_relic_amount
+                  ):
+                nonprogress_locations.add(loc)
+
             elif data.flags & enabled_flags == data.flags:
                 progress_locations.add(loc)
             else:

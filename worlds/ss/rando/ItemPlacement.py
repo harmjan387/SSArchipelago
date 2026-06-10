@@ -127,7 +127,6 @@ def _fill_itempool(world: "SSWorld", pool: list[str], filler_pool: list[str]) ->
     for loc in world.multiworld.get_locations(world.player):
         if not loc.item:
             num_items_needed += 1
-
     num_items_needed -= len(pool)
     num_items_needed -= len(filler_pool)
 
@@ -284,20 +283,6 @@ def _handle_placements(world: "SSWorld", pool: list[str]) -> list[str]:
                 world.create_item("Gratitude Crystal")
             )
             placed.append("Gratitude Crystal")
-
-    if not options.treasuresanity_in_silent_realms:
-        for loc in world.get_locations():
-            if getattr(loc, "type", None) == SSLocType.RELIC:
-                loc.place_locked_item(world.create_item("Dusk Relic"))
-                placed.append("Dusk Relic")
-    else:
-        num_relics = options.trial_treasure_amount.value
-        for trl in TRIAL_LIST:
-            all_relics = [loc for loc in world.multiworld.get_locations(world.player) if loc.parent_region == world.get_region(trl) and loc.type == SSLocType.RELIC]
-            relics_to_place = [rel for rel in all_relics if int(rel.name.split(" ")[-1]) > num_relics]
-            for rel in relics_to_place:
-                rel.place_locked_item(world.create_item("Dusk Relic"))
-                placed.append("Dusk Relic")
 
     if not options.shopsanity:
         for loc, data in LOCATION_TABLE.items():
