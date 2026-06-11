@@ -316,6 +316,7 @@ class SSWorld(World):
             for short_loc_name, rule in data["locations"].items():
                 full_loc_name = f"{data["hint_region"]} - {short_loc_name}"
                 og_full_loc_name = deepcopy(full_loc_name)
+                loc_data = LOCATION_TABLE[full_loc_name]
                 if LOCATION_TABLE[full_loc_name].flags & SSLocFlag.BTREAUX:
                     # Remove location from progress or nonprogress locations
                     if full_loc_name in self.progress_locations:
@@ -361,7 +362,8 @@ class SSWorld(World):
                         location.progress_type = LocationProgressType.EXCLUDED
                 else:
                     if full_loc_name in self.nonprogress_locations:
-                        continue
+                        if not (loc_data.flags & (SSLocFlag.BEEDLE | SSLocFlag.ALWAYS)):
+                            continue
                     # Create a normal location
                     location = SSLocation(self.player, full_loc_name, region, LOCATION_TABLE[full_loc_name])
                 region.locations.append(location)
