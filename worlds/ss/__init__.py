@@ -357,6 +357,8 @@ class SSWorld(World):
 
                     # Create a batreaux reward location
                     location = SSLocation(self.player, full_loc_name, region, LOCATION_TABLE[og_full_loc_name], ogname=og_full_loc_name)
+                    if not bat_loc_progress:
+                        location.progress_type = LocationProgressType.EXCLUDED
                 else:
                     if full_loc_name in self.nonprogress_locations:
                         continue

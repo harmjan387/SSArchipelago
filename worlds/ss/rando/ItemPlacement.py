@@ -91,6 +91,13 @@ def _create_base_itempool(world: "SSWorld") -> tuple[list[str], list[str], list[
     useful_pool: list[str] = []
     filler_pool: list[str] = []
     for item, data in ITEM_TABLE.items():
+        quantity = data.quantity
+        if item == "Dusk Relic":
+            if world.options.treasuresanity_in_silent_realms:
+                quantity = world.options.trial_treasure_amount.value * 4 + 1
+            else:
+                quantity = 1
+
         if data.type in ["Item", "Small Key", "Boss Key", "Map"]:
             adjusted_classification = item_classification(world, item)
             classification = (
@@ -100,16 +107,11 @@ def _create_base_itempool(world: "SSWorld") -> tuple[list[str], list[str], list[
             )
 
             if classification == IC.progression or classification == IC.progression_skip_balancing:
-                progression_pool.extend([item] * data.quantity)
+                progression_pool.extend([item] * quantity)
             elif classification == IC.useful:
-                useful_pool.extend([item] * data.quantity)
+                useful_pool.extend([item] * quantity)
             else:
-                filler_pool.extend([item] * data.quantity)
-
-    if not world.options.rupeesanity:
-        filler_pool.extend([data.vanilla_item for loc, data in LOCATION_TABLE.items() if data.flags & SSLocFlag.RUPEE])
-            # Put all placed rupees in filler pool if rupeesanity is on
-            # These will be removed from the pool and manually placed vanilla
+                filler_pool.extend([item] * quantity)
 
     return progression_pool, useful_pool, filler_pool
 
@@ -130,12 +132,20 @@ def _fill_itempool(world: "SSWorld", pool: list[str], filler_pool: list[str]) ->
     num_items_needed -= len(pool)
     num_items_needed -= len(filler_pool)
 
-    consumable_pool = world.random.choices(
-        list(CONSUMABLE_ITEMS.keys()),
-        weights=list(CONSUMABLE_ITEMS.values()),
-        k=num_items_needed,
-    )
-    filler_pool.extend(consumable_pool)
+    if num_items_needed > 0:
+        consumable_pool = world.random.choices(
+            list(CONSUMABLE_ITEMS.keys()),
+            weights=list(CONSUMABLE_ITEMS.values()),
+            k=num_items_needed,
+        )
+        filler_pool.extend(consumable_pool)
+
+    elif num_items_needed < 0:
+        remove_count = min(-num_items_needed, len(filler_pool))
+        world.random.shuffle(filler_pool)
+        del filler_pool[:remove_count]
+        # If we have more than enough items, just remove some filler items from the pool
+
     world.random.shuffle(filler_pool)
 
     # Now fill rupoors
