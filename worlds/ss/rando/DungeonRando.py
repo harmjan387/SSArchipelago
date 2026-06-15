@@ -137,7 +137,7 @@ class DungeonKeyHandler:
                     loc.place_locked_item(self.world.create_item(data.vanilla_item))
                     placed.append(data.vanilla_item)
                 for dun, map_item in self.all_maps.items():
-                    if(self.world.options.empty_unrequired_dungeons == True and dun not in self.progression_dungeons and map_item not in placed):
+                    if (self.world.options.empty_unrequired_dungeons == True and dun not in self.progression_dungeons and map_item not in placed):
                         placed.extend([map_item])
             return placed
         elif self.world.options.map_mode == "own_dungeon_restricted":
@@ -222,7 +222,7 @@ class DungeonKeyHandler:
                         locs_placeable[dun][i] = [(loc, self.world.player) for loc in locs if not self.world.get_location(loc).item]
         elif self.world.options.small_key_mode == "anywhere":
             for dun, skey_items in self.all_skeys.items():
-                if(self.world.options.empty_unrequired_dungeons == True and dun not in self.progression_dungeons):
+                if (self.world.options.empty_unrequired_dungeons == True and dun not in self.progression_dungeons):
                     placed.extend(skey_items)
             return placed
         for dun, skey_items in self.all_skeys.items():
@@ -334,7 +334,7 @@ class DungeonKeyHandler:
                     (loc).place_locked_item(self.world.create_item(data.vanilla_item))
                     placed.append(data.vanilla_item)
                 for dun, bkey_item in self.all_bkeys.items():
-                    if(self.world.options.empty_unrequired_dungeons == True and dun not in self.progression_dungeons and bkey_item not in placed):
+                    if (self.world.options.empty_unrequired_dungeons == True and dun not in self.progression_dungeons and bkey_item not in placed):
                         placed.extend([bkey_item])
             return placed
         elif self.world.options.boss_key_mode == "own_dungeon":
@@ -354,11 +354,11 @@ class DungeonKeyHandler:
                         locs_placeable[dun].append(tuple([loc.name, loc.player]))
         elif self.world.options.boss_key_mode == "anywhere":
                 for dun, bkey_item in self.all_bkeys.items():
-                    if(self.world.options.empty_unrequired_dungeons == True and dun not in self.progression_dungeons and bkey_item not in placed):
+                    if (self.world.options.empty_unrequired_dungeons == True and dun not in self.progression_dungeons and bkey_item not in placed):
                         placed.extend([bkey_item])
                 return placed
         for dun, bkey_item in self.all_bkeys.items():
-            if(self.world.options.empty_unrequired_dungeons == True and dun not in self.progression_dungeons):
+            if (self.world.options.empty_unrequired_dungeons == True and dun not in self.progression_dungeons):
                 placed.append(bkey_item)
                 continue
             if bkey_item in self.start_bkeys:

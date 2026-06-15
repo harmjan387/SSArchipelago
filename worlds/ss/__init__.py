@@ -152,6 +152,7 @@ class SSWorld(World):
 
         self.progress_locations: set[str] = set()
         self.nonprogress_locations: set[str] = set()
+        self.overflow_items: list[str] = []
 
         self.dungeons = DungeonRando(self)
         self.entrances = EntranceRando(self)
@@ -643,21 +644,27 @@ class SSWorld(World):
                     output_data["Locations"][location.ogname] = item_info
                 else:
                     output_data["Locations"][location.name] = item_info
+        ap_location_names = {loc.name for loc in multiworld.get_locations(player)}
 
         for location in self.nonprogress_locations:
+            if location in ap_location_names:
+                continue
             loc_data = LOCATION_TABLE.get(location)
 
             if loc_data is None:
                 item_name = "Red Rupee"
             else:    
-                #decide if want to place vanilla item or fallback to red rupee
+                # decide if we want to place the vanilla item or fill based on overflow pool
                 is_trial_relic = loc_data.type == SSLocType.RELIC
                 is_rupee_location = loc_data.flags == SSLocFlag.RUPEE
 
                 if is_trial_relic or is_rupee_location:
                     item_name = loc_data.vanilla_item
                 else:
-                    item_name = "Red Rupee"
+                    if self.overflow_items:
+                        item_name = self.overflow_items.pop()
+                    else:
+                        item_name = "Red Rupee"
                 item_info = {
                     "player": self.player,
                     "name": item_name,

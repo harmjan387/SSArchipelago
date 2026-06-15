@@ -67,6 +67,7 @@ def handle_itempool(world: "SSWorld") -> None:
             pool.remove(itm)
     
     pool = _fill_itempool(world, pool, filler_pool)
+    _fill_overflowpool(world)
 
     # Create the pool of the remaining shuffled items.
     items = [world.create_item(itm) for itm in pool]
@@ -141,10 +142,10 @@ def _fill_itempool(world: "SSWorld", pool: list[str], filler_pool: list[str]) ->
         filler_pool.extend(consumable_pool)
 
     elif num_items_needed < 0:
-        remove_count = min(-num_items_needed, len(filler_pool))
+        overflow_count = min(-num_items_needed, len(filler_pool))
         world.random.shuffle(filler_pool)
-        del filler_pool[:remove_count]
-        # If we have more than enough items, just remove some filler items from the pool
+        world.overflow_items.extend(filler_pool[:overflow_count])
+        del filler_pool[:overflow_count]
 
     world.random.shuffle(filler_pool)
 
@@ -170,6 +171,51 @@ def _fill_itempool(world: "SSWorld", pool: list[str], filler_pool: list[str]) ->
 
     return pool
 
+def _fill_overflowpool(world: "SSWorld") -> None:
+    """
+    Fills an overflow pool to fill the uncreated locations for the patchfile
+
+    :param world: The SS game world.
+    """
+    total_locations = len(LOCATION_TABLE)
+    ap_locations = len(world.multiworld.get_locations(world.player))
+  
+    if world.options.treasuresanity_in_silent_realms:
+        vanilla_dusk_relic_count =  40 - (
+            world.options.trial_treasure_amount.value * 4
+        )
+    else:
+        vanilla_dusk_relic_count = 40
+
+    if not world.options.rupeesanity:
+        rupeesanity_vanilla_location_count = 0
+        for data in LOCATION_TABLE.values():
+            if data.flags & SSLocFlag.RUPEE:
+                rupeesanity_vanilla_location_count += 1
+        excluded_rupee_locations_count = rupeesanity_vanilla_location_count
+    else:
+        excluded_rupee_locations_count = 0
+
+    # calculate the amount of overflow locations to be filled
+    overflow_count = (
+        total_locations
+        -ap_locations
+        -vanilla_dusk_relic_count
+        -excluded_rupee_locations_count
+        -len(world.overflow_items)
+    )
+
+    if overflow_count <= 0:
+        return
+    
+        # Fill overflow with weighted consumables
+    overflow_pool = world.random.choices(
+        list(CONSUMABLE_ITEMS.keys()),
+        weights=list(CONSUMABLE_ITEMS.values()),
+        k=overflow_count,
+    )
+    world.random.shuffle(overflow_pool)
+    world.overflow_items.extend(overflow_pool)
 
 def _handle_starting_items(world: "SSWorld") -> list[str]:
     """
