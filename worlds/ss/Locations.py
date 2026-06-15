@@ -258,7 +258,7 @@ LOCATION_TABLE: dict[str, SSLocData] = {
     ),
     # Central Skyloft
     "Central Skyloft - Potion Lady's Gift": SSLocData(
-        13, 
+        13,
         SSLocFlag.ALWAYS,
         "Central Skyloft",
         "F004r",
