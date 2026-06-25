@@ -802,7 +802,7 @@ def location_requirements(world: "SSWorld", loc):
             state.can_reach_region("Lanayru Desert - Temple of Time - Temple", player)
             and (
                 (state.has("Progressive Sword", player, 2))
-                and state.has("Hook Beetle", player, 1)
+                and (state.has("Progressive Beetle", player, 2))
             )
         )
     if loc == "Sky - Beedle's Crystals":
@@ -3512,7 +3512,9 @@ def exit_requirements(world: "SSWorld", ex):
     if ex == "Eldin Volcano - Near Temple Entrance - Upper Eldin Cave":
         return lambda state, player=world.player: True
     if ex == "Eldin Volcano - Near Temple Entrance - Dungeon Entrance in Eldin Volcano":
-        return lambda state, player=world.player: state.has("Key Piece", player, 5)
+        return lambda state, player=world.player: state.has(
+            "Key Piece", player, 5
+        ) or state._ss_option_et_open(player)
     if ex == "Eldin Volcano - Hot Cave - Near Temple Entrance":
         return lambda state, player=world.player: state.can_reach_region(
             "Eldin Volcano - Near Temple Entrance", player
