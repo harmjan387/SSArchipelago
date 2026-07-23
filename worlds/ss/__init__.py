@@ -5,7 +5,7 @@ from base64 import b64encode
 from copy import deepcopy
 from collections.abc import Mapping
 from dataclasses import fields
-from typing import Any, ClassVar
+from typing import Any, ClassVar, Optional
 
 import threading
 import yaml
@@ -146,6 +146,16 @@ class SSWorld(World):
 
     create_items = handle_itempool
     set_rules = set_rules
+
+    num_required_dungeons: int
+    batreaux_rewards: dict
+    batreaux_requirements: dict
+    batreaux_ognames: dict
+    connected_regions: set
+    connected_entrances: set
+
+    ut_gen: bool
+    ut_can_gen_without_yaml = True  # class var that tells it to ignore the player yaml
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -291,11 +301,19 @@ class SSWorld(World):
         Run before any other steps of the multiworld, but after options.
         """
 
-        # Shuffle required dungeons and entrances according to options
-        self.dungeons.randomize_required_dungeons()
+        ut_gen: bool = hasattr(self.multiworld, "re_gen_passthrough") \
+                and isinstance(self.multiworld.re_gen_passthrough, dict) \
+                and self.game in self.multiworld.re_gen_passthrough
+        self.ut_gen = ut_gen
 
-        self.entrances.randomize_starting_statues()
-        self.entrances.randomize_starting_entrance()
+        if ut_gen:
+            self.interpret_slot_data(None)
+
+        # Shuffle required dungeons and entrances according to options
+        self.dungeons.randomize_required_dungeons(ut_gen)
+
+        self.entrances.randomize_starting_statues(ut_gen)
+        self.entrances.randomize_starting_entrance(ut_gen)
         self.origin_region_name = self.entrances.starting_entrance["apregion"]
 
         # Determine progress and nonprogress locations
@@ -303,7 +321,7 @@ class SSWorld(World):
             self.determine_progress_and_nonprogress_locations()
         )
 
-        self.batreaux_rewards = shuffle_batreaux_counts(self)
+        self.batreaux_rewards = shuffle_batreaux_counts(self, ut_gen)
         self.batreaux_requirements = {}
         self.batreaux_ognames = {}
 
@@ -375,13 +393,13 @@ class SSWorld(World):
 
         self.connect_regions(self.origin_region_name)
 
-        self.entrances.randomize_trial_gates()
+        self.entrances.randomize_trial_gates(self.ut_gen)
 
         # if self.options.randomize_entrances == "all_entrances":
         #     self.entrances.randomize_entrances()
         # elif
         if self.options.randomize_entrances == "dungeons_only" or self.options.randomize_entrances == "required_dungeons_only":
-            self.entrances.randomize_dungeon_entrances_only()
+            self.entrances.randomize_dungeon_entrances_only(self.ut_gen)
 
         #for ent in self.get_entrances():
         #    print(f"{ent.parent_region} -> {ent.name} -> {ent.connected_region}")
@@ -732,6 +750,9 @@ class SSWorld(World):
             "gondo_upgrades": self.options.gondo_upgrades.value,
             "sword_dungeon_reward": self.options.sword_dungeon_reward.value,
             "batreaux_counts": self.options.batreaux_counts.value,
+            "batreaux_rewards": self.batreaux_rewards,
+            "starting_statues": self.entrances.starting_statues,
+            "starting_entrance": self.entrances.starting_entrance,
             "randomize_boss_key_puzzles": self.options.randomize_boss_key_puzzles.value,
             "random_puzzles": self.options.random_puzzles.value,
             "peatrice_conversations": self.options.peatrice_conversations.value,
@@ -771,8 +792,43 @@ class SSWorld(World):
             "excluded_locations": self.nonprogress_locations,
             "required_dungeons": self.dungeons.required_dungeons,
             "entrances": self.entrances.entrance_mapping.output_entrance_mapping(),
+            "progression_goddess_chests": self.options.progression_goddess_chests.value,
+            "progression_minigames": self.options.progression_minigames.value,
+            "progression_crystals": self.options.progression_crystals.value,
+            "progression_scrapper": self.options.progression_scrapper.value,
+            "progression_batreaux": self.options.progression_batreaux.value,
+            "progression_balancing": self.options.progression_balancing.value,
+            "lanayru_caves_small_key": self.options.lanayru_caves_small_key.value,
+            "trial_connections": self.entrances.trial_connections,
+            "dungeon_connections": self.entrances.dungeon_connections,
         }
 
         return slot_data
 
+    def interpret_slot_data(self, slot_data: Optional[dict[str, Any]]) -> Optional[dict[str, Any]]:
+        """Used by Universal Tracker to correctly rebuild state"""
 
+        if not slot_data:
+            slot_data = self.multiworld.re_gen_passthrough[self.game]
+
+        if not slot_data:
+            return None
+
+        option_aliases = {"hint_distribution": "ap_hint_distribution"}
+        for option_name, option_type in self.options_dataclass.type_hints.items():
+            slot_key = option_aliases.get(option_name, option_name)
+            if slot_key not in slot_data:
+                continue
+            option_value = slot_data[slot_key]
+            if isinstance(option_value, option_type):
+                setattr(self.options, option_name, option_value)
+            else:
+                setattr(self.options, option_name, option_type.from_any(option_value))
+
+        self.entrances.starting_entrance = slot_data["starting_entrance"]
+        self.origin_region_name = self.entrances.starting_entrance["apregion"]
+        self.entrances.starting_statues = slot_data["starting_statues"]
+        self.dungeons.required_dungeons = slot_data["required_dungeons"]
+        self.batreaux_rewards = slot_data["batreaux_rewards"]
+
+        return slot_data

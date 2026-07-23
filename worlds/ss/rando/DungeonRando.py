@@ -20,7 +20,7 @@ class DungeonRando:
 
     def __init__(self, world: "SSWorld"):
         self.world = world
-        self.multiword = world.multiworld
+        self.multiworld = world.multiworld
 
         self.required_dungeons: list[str] = []
         self.banned_dungeons: list[str] = []
@@ -32,24 +32,28 @@ class DungeonRando:
 
         self.key_handler: DungeonKeyHandler = DungeonKeyHandler(self.world)
 
-    def randomize_required_dungeons(self) -> None:
+    def randomize_required_dungeons(self, ut_gen: bool) -> None:
         """
         Randomize required dungeons based on player's options
         """
 
         self.num_required_dungeons = self.world.options.required_dungeon_count.value
         main_dungeons = list(DUNGEON_FINAL_CHECKS.keys())
-        self.world.random.shuffle(main_dungeons)
 
-        if self.num_required_dungeons > 6 or self.num_required_dungeons < 0:
-            raise OptionError("Required dungeon count must be between 0 and 6.")
+        if ut_gen:
+            self.required_dungeons = list(self.world.multiworld.re_gen_passthrough[self.world.game]["required_dungeons"])
+        else:
+            self.world.random.shuffle(main_dungeons)
 
-        # Randomize required dungeons
-        self.required_dungeons.extend(
-            self.world.random.sample(
-                main_dungeons, k=self.num_required_dungeons
+            if self.num_required_dungeons > 6 or self.num_required_dungeons < 0:
+                raise OptionError("Required dungeon count must be between 0 and 6.")
+
+            # Randomize required dungeons
+            self.required_dungeons.extend(
+                self.world.random.sample(
+                    main_dungeons, k=self.num_required_dungeons
+                )
             )
-        )
         self.required_dungeons = sorted(self.required_dungeons, key=lambda i: DUNGEON_LIST.index(i))
 
         self.required_dungeon_checks.extend(
