@@ -3309,8 +3309,6 @@ def exit_requirements(world: "SSWorld", ex):
             )
             or (state._ss_option_lake_floria_open(player))
         )
-    if ex == "Faron Woods - In the Woods - Shortcut to Floria Waterfall":
-        return lambda state, player=world.player: True
     if ex == "Faron Woods - Viewing Platform - Fly to Sky":
         return lambda state, player=world.player: True
     if ex == "Faron Woods - Viewing Platform - In the Woods":

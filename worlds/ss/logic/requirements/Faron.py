@@ -93,8 +93,7 @@ FARON_REQUIREMENTS = {
                 "& ( (Can Talk to Yerbal & Has Goddess Sword) "
                 "| (Can Talk to Yerbal & option_lake_floria_yerbal) "
                 "| (option_lake_floria_open) )"
-            ),
-            "Shortcut to Floria Waterfall": "Nothing",
+            )
         },
         "locations": {
             "Item behind Lower Bombable Rock": "Bomb Bag",
